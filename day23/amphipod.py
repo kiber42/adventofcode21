@@ -5,6 +5,7 @@ class Maze:
     self.cost = cost
 
 
+  # Simplified representation, empty queues are omitted
   def __repr__(self):
     max_depth = max(len(queue) for queue in self.queues)
     lines = [
@@ -16,8 +17,9 @@ class Maze:
     return "\n".join(lines)
 
 
-  # if move is a 3-tuple (cost, lane, corridor) => amphipod exits lane A-D to corridor tile
-  # if move is an int (0-10) => amphipod from corridor tile 0-10 enters its target lane
+  # Apply move to current state
+  # If move is a 3-tuple (cost, lane, corridor) => amphipod exits lane A-D to corridor tile
+  # If move is an int (0-10) => amphipod from corridor tile 0-10 enters its target lane
   def apply(self, move):
     if isinstance(move, tuple):
       self.cost += move[0]
@@ -63,7 +65,7 @@ class Maze:
     return lane * 2 + 2
 
 
-  # Test if all corridor tiles in ]start,target] are free.
+  # Test if all corridor tiles in ]start,target] are free
   def corridor_free(self, start_pos, target_pos):
     r = range(start_pos + 1, target_pos + 1) if target_pos > start_pos else range(target_pos, start_pos)
     return all(self.corridor[pos] is None for pos in r)
@@ -119,13 +121,15 @@ class Maze:
         if self.corridor[intermediate] is None and self.corridor_free(start, intermediate):
           pod = self.queues[lane][0]
           target = self.lane2pos(pod)
-          # Compute full cost for moving into the corridor and from there to the target lane.
+          # Compute full cost for moving into the corridor and from there to the target lane
           yield 10**pod * (abs(intermediate - start) + abs(target - intermediate)), lane, intermediate
 
 
 if __name__ == "__main__":
-  maze = Maze.load("amphipod.input", False)
-  best, best_moves = maze.solve()
-  for move in best_moves:
-    maze.apply(move)
-  print("Solution requires", best, "energy.")
+  for unfold in [False, True]:
+    maze = Maze.load("amphipod.example", unfold)
+    best, best_moves = maze.solve()
+    for move in best_moves:
+      maze.apply(move)
+      print(maze)
+    print("Solution requires", best, "energy.")
