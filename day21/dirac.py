@@ -8,12 +8,11 @@ class DeterministicDie:
     self.num_rolls = 0
 
   def __call__(self):
-    result = 3 * self.val + 6
-    if result > 297:
-      result -= 100
-    self.val = (self.val + 2) % 100 + 1
+    # Directly return the sum of 3 consecutive rolls.
+    # Since there are 3 rolls, this sum increases by 9 each time.
+    # Ignore roll-over at 100, since only the result modulo 10 is of interest.
     self.num_rolls += 3
-    return result
+    return 3 * (self.num_rolls - 1)
 
 
 def practice_game(starting_positions):
@@ -77,6 +76,6 @@ def full_game(starting_positions):
 
 
 if __name__ == "__main__":
-  starting_positions = [int(line.split()[-1]) for line in open("dirac.input").readlines()]
+  starting_positions = [int(line.split()[-1]) for line in open("dirac.example").readlines()]
   print("Practice game:", practice_game(starting_positions))
   print("Full game:", full_game(starting_positions))
